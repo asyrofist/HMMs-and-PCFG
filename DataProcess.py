@@ -45,7 +45,7 @@ def extract_vocab(unigram_count, min_count = 1):
     vocab = defaultdict(int)
     for word, count in unigram_count.items()
         if count <= min_count:
-            vocab[("<UNK>", word[1])] += 1
+            vocab[("<UNK>", word[1])] += min_count
         else: 
             vocab[word] = count
     return vocab

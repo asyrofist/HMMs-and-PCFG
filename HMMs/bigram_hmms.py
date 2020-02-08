@@ -1,5 +1,7 @@
-from collections import defaultdict
+import sys, os
+sys.path.append("~/Desktop/nlp/HMMs-and-PCFG/HMMs")
 
+from collections import defaultdict
 
 def generate_bigrams(sentence):
     bigrams = []
@@ -16,7 +18,7 @@ def count_bigrams(corpus):
             bigram_count[bigram] += 1
     return bigram_count
 
-def bigram_proba(u, v, unigram_count, bigram_count, k = 0, V):
+def bigram_proba(u, v, unigram_count, bigram_count, V, k = 0):
     p = (bigram_count((u,v))+k)/(unigram_count(u)+V)
     return p
 

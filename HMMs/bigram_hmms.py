@@ -11,7 +11,12 @@ def generate_bigrams(sentence):
 def count_bigrams(corpus):
     bigram_count = defaultdict(int)
     for sentence in corpus:
-        bigrams = generate_bigrams(sentences)
+        bigrams = generate_bigrams(sentence)
         for bigram in bigrams:
             bigram_count[bigram] += 1
     return bigram_count
+
+def bigram_proba(u, v, unigram_count, bigram_count, k = 0, V):
+    p = (bigram_count((u,v))+k)/(unigram_count(u)+V)
+    return p
+

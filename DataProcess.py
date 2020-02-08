@@ -43,12 +43,12 @@ def extract_vocab(unigram_count, min_count = 1):
     output : defaultdict with unigrams of low frequency converted to <UNK> : count
     """
     vocab = defaultdict(int)
-    for word, count in unigram_count.items()
+    for word, count in unigram_count.items():
         if count <= min_count:
             vocab[("<UNK>", word[1])] += min_count
         else: 
             vocab[word] = count
-    return vocab
+    return vocab, len(vocab)
 
 def remove_punctuation(sentence):
     return sentence.translate(str.maketrans('','',string.punctuation))

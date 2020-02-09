@@ -20,14 +20,17 @@ def tokenize_sentence(sentence):
         processed_tokens.append((word[1:-1] ,pos[1:-1]))
     return processed_tokens
 
-def tokenize_corpus(corpus):
+def tokenize_corpus(corpus, n):
     """
     input : corpus as list of sentences
     output : list of lists of tuples (word, pos)
     """
     processed_corpus = []
     for sentence in corpus:
-        processed_corpus.append(tokenize_sentence(sentence))
+        if n = 2:
+            processed_corpus.append(["<START>"] + tokenize_sentence(sentence) + ["<STOP>"])
+        if n = 3:
+            processed_corpus.append(["<START1>", "<START2>"] + tokenize_sentence(sentence) + ["<STOP>"])
     return processed_corpus
 
 def count_unigrams(corpus):

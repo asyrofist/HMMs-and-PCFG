@@ -27,9 +27,9 @@ def tokenize_corpus(corpus, n):
     """
     processed_corpus = []
     for sentence in corpus:
-        if n = 2:
+        if n == 2:
             processed_corpus.append(["<START>"] + tokenize_sentence(sentence) + ["<STOP>"])
-        if n = 3:
+        if n == 3:
             processed_corpus.append(["<START1>", "<START2>"] + tokenize_sentence(sentence) + ["<STOP>"])
     return processed_corpus
 

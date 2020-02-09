@@ -11,7 +11,7 @@ def generate_trigrams(sentence):
         trigrams.append(trigram)
     return trigrams
 
-def trigram_count(corpus):
+def count_trigrams(corpus):
     trigram_count = defaultdict(int)
     for sentence in corpus:
         trigrams = generate_trigrams(sentence)
@@ -20,5 +20,5 @@ def trigram_count(corpus):
     return trigram_count
 
 def trigram_proba(u,v,w, bigram_count, trigram_count, V, k = 0):
-    p = (trigram_count(u,v,w)+k)/(bigram_count(u,v)+V)
+    p = (trigram_count[(u,v,w)]+k)/(bigram_count(u,v)+k*V)
     return p

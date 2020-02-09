@@ -25,6 +25,6 @@ def bigram_proba(u, v, unigram_count, bigram_count, V, k = 0):
         else:
             p = k/(unigram_count[v]+k*V)
     else:
-        p = (bigram_count[(u,v)]+k)/(unigram_count[v]+k*V)
+        p = (bigram_count[(u,v)]+k)/(unigram_count[u]+k*V)
     return p
 

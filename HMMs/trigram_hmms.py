@@ -20,5 +20,11 @@ def count_trigrams(corpus):
     return trigram_count
 
 def trigram_proba(u,v,w, bigram_count, trigram_count, V, k = 0):
-    p = (trigram_count[(u,v,w)]+k)/(bigram_count(u,v)+k*V)
+    if (u,v,w) not in trigram_count:
+        if (u,v) not in bigram_count:
+            p = 1/V
+        else:
+            p = k/(bigram_count[(u,v)]+k*V)
+    else:
+        p = (trigram_count[(u,v,w)]+k)/(bigram_count[(u,v)]+k*V)
     return p

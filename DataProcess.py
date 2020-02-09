@@ -50,6 +50,21 @@ def extract_vocab(unigram_count, min_count = 1):
             vocab[word] = count
     return vocab, len(vocab)
 
+def set_unk(corpus, vocab):
+    """
+    input: corpus, list of lists of tuples (word, pos)
+    output: corpus with words not in vocab converted to UNK.  list of lists of tuples (<UNK>, pos)
+    """
+    new_corpus = []
+    for sentence in corpus:
+        new_sentence = []
+        for word in sentence:
+            if word not in vocab:
+                word = ("<UNK>", word[1])
+            new_sentence.append(word)
+        new_corpus.append(new_sentence)
+    return new_corpus
+
 def remove_punctuation(sentence):
     return sentence.translate(str.maketrans('','',string.punctuation))
 

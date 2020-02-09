@@ -19,6 +19,12 @@ def count_bigrams(corpus):
     return bigram_count
 
 def bigram_proba(u, v, unigram_count, bigram_count, V, k = 0):
-    p = (bigram_count[(u,v)]+k)/(unigram_count[u]+k*V)
+    if (u,v) not in bigram_count:
+        if u not in unigram_count:
+            p = 1/V
+        else:
+            p = k/(unigram_count[v]+k*V)
+    else:
+        p = (bigram_count[(u,v)]+k)/(unigram_count[v]+k*V)
     return p
 

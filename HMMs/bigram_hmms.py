@@ -30,6 +30,7 @@ def bigram_proba(u, v, unigram_count, bigram_count, V, k = 0):
         p = (bigram_count[(u,v)]+k)/(unigram_count[u]+k*V)
     return p
 
+
 def process_train_corpus(train_path):
     train_file = read_file(train_path)
     train_raw = tokenize_corpus(train_file,2)
@@ -39,7 +40,9 @@ def process_train_corpus(train_path):
     return vocab, V, train_processed
 
 class bigramHMMs:
-    def __init__(self, train_path, dev_path, test_path):
+    def __init__(self, train_path, dev_path, test_path, k):
+        self.k = k
+
         # extract vocabulary from train files, process training file with UNK
         self.vocab, self.V, self.train_file = process_train_corpus(train_path)
         # process raw dev and test files
@@ -49,6 +52,18 @@ class bigramHMMs:
         # count unigrams and bigrams
         self.unigram_count = count_unigrams(self.train_file)
         self.bigram_count = count_bigrams(self.train_file)
+
+        # unigram and bigram probabilities
+        self.unigram_probabilities = defaultdict(float)
+        self.bigram_probabilities = defaultdict(float)
+
+        self.make_bigram_proba_dict(self.train_file)
+
+    def make_bigram_proba_dict(self, corpus):
+        for sentence in corpus:
+            bigrams = generate_bigrams(sentence)
+            for bigram in bigrams:
+                self.bigram_probabilities[(bigram[0],bigram[1])] = bigram_proba(bigram[0],bigram[1],self.unigram_count, self.bigram_count, self.V, self.k)
 
 
 

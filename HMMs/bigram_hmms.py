@@ -64,7 +64,25 @@ class bigramHMMs:
             bigrams = generate_bigrams(sentence)
             for bigram in bigrams:
                 self.bigram_probabilities[(bigram[0],bigram[1])] = bigram_proba(bigram[0],bigram[1],self.unigram_count, self.bigram_count, self.V, self.k)
+    
+    # this would be for transition probabilities
+    def word_count(self):
+        return None
 
+    # this would be for emission probabilities
+    def tag_count(self):
+        return None
 
+    def transition_proba(self):
+        return None
+
+    def emission_proba(self):
+        return None
+
+    def viterbi_trellis(self):
+        return None
+
+    def cell_probabilities(self):
+        return None
 
 

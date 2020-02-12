@@ -30,6 +30,13 @@ def bigram_proba(u, v, unigram_count, bigram_count, V, k = 0):
         p = (bigram_count[(u,v)]+k)/(unigram_count[u]+k*V)
     return p
 
+def emission_proba(w, t, unigram_count, tag_count):
+    if (w,t) not in unigram_count:
+        p = unigram_count[("<UNK>",t)]/tag_count[t]
+    else:
+        p = unigram_count[(w,t)]/tag_count[t]
+    return p
+
 
 def process_train_corpus(train_path):
     train_file = read_file(train_path)
@@ -69,6 +76,8 @@ class bigramHMMs:
 
         self.make_bigram_proba_dict(self.train_file)
 
+        self.emission_probabilities = defaultdict(float)
+
     def make_bigram_proba_dict(self, corpus):
         for sentence in corpus:
             bigrams = generate_bigrams(sentence)
@@ -92,9 +101,6 @@ class bigramHMMs:
             else:
                 self.bigram_tc[(v[1],w[1])] += c
 
-    # this would be for emission probabilities
-    def tag_count(self):
-        return None
 
     def transition_proba(self):
         return None

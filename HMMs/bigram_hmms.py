@@ -57,6 +57,10 @@ class bigramHMMs:
         self.unigram_probabilities = defaultdict(float)
         self.bigram_probabilities = defaultdict(float)
 
+        # unigram and bigram word count
+        self.unigram_wc = defaultdict(int)
+        self.bigram_wc = defaultdict(int)
+
         self.make_bigram_proba_dict(self.train_file)
 
     def make_bigram_proba_dict(self, corpus):
@@ -66,7 +70,14 @@ class bigramHMMs:
                 self.bigram_probabilities[(bigram[0],bigram[1])] = bigram_proba(bigram[0],bigram[1],self.unigram_count, self.bigram_count, self.V, self.k)
     
     # this would be for transition probabilities
-    def word_count(self):
+    def unigram_word_count(self):
+        self.unigram_wc["<START>"] = self.unigram_count["<START>"]
+        self.unigram_wc["<STOP>"] = self.unigram_count["<STOP>"]
+        for w,c in self.unigram_count.items():
+            if w != "<START>" and w != "<STOP>":
+                self.unigram_wc[w] += c
+
+    def bigram_word_count(self):
         return None
 
     # this would be for emission probabilities

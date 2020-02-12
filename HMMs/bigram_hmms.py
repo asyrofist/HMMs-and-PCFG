@@ -57,12 +57,15 @@ class bigramHMMs:
         self.unigram_probabilities = defaultdict(float)
         self.bigram_probabilities = defaultdict(float)
 
-        # unigram and bigram word count
-        self.unigram_wc = defaultdict(int)
-        self.bigram_wc = defaultdict(int)
+        # unigram and bigram tag count
+        self.unigram_tc = defaultdict(int)
+        self.bigram_tc = defaultdict(int)
 
-        self.unigram_word_count()
-        self.bigram_word_count()
+        self.unigram_tag_count()
+        self.bigram_tag_count()
+
+        # unique tags and
+        self.tags = set()
 
         self.make_bigram_proba_dict(self.train_file)
 
@@ -73,21 +76,21 @@ class bigramHMMs:
                 self.bigram_probabilities[(bigram[0],bigram[1])] = bigram_proba(bigram[0],bigram[1],self.unigram_count, self.bigram_count, self.V, self.k)
     
     # this would be for transition probabilities
-    def unigram_word_count(self):
-        self.unigram_wc["<START>"] = self.unigram_count["<START>"]
-        self.unigram_wc["<STOP>"] = self.unigram_count["<STOP>"]
+    def unigram_tag_count(self):
+        self.unigram_tc["<START>"] = self.unigram_count["<START>"]
+        self.unigram_tc["<STOP>"] = self.unigram_count["<STOP>"]
         for w,c in self.unigram_count.items():
             if w != "<START>" and w != "<STOP>":
-                self.unigram_wc[w[0]] += c
+                self.unigram_tc[w[1]] += c
 
-    def bigram_word_count(self):
+    def bigram_tag_count(self):
         for (v,w),c in self.bigram_count.items():
             if v == "<START>":
-                self.bigram_wc[(v,w[0])] += c
+                self.bigram_tc[(v,w[1])] += c
             elif w == "<STOP>":
-                self.bigram_wc[(v[0],w)] += c
+                self.bigram_tc[(v[1],w)] += c
             else:
-                self.bigram_wc[(v[0],w[0])] += c
+                self.bigram_tc[(v[1],w[1])] += c
 
     # this would be for emission probabilities
     def tag_count(self):

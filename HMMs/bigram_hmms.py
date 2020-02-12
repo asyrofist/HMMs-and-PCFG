@@ -61,6 +61,9 @@ class bigramHMMs:
         self.unigram_wc = defaultdict(int)
         self.bigram_wc = defaultdict(int)
 
+        self.unigram_word_count()
+        self.bigram_word_count()
+
         self.make_bigram_proba_dict(self.train_file)
 
     def make_bigram_proba_dict(self, corpus):
@@ -78,7 +81,13 @@ class bigramHMMs:
                 self.unigram_wc[w] += c
 
     def bigram_word_count(self):
-        return None
+        for (v,w),c in self.bigram_count.items():
+            if v == "<START>":
+                self.bigram_wc[(v,w[0])] += c
+            elif w == "<STOP>":
+                self.bigram_wc[(v[0],w)] += c
+            else:
+                self.bigram_wc[(v[0],w[0])] += c
 
     # this would be for emission probabilities
     def tag_count(self):

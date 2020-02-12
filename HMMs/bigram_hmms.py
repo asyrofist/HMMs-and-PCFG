@@ -78,7 +78,7 @@ class bigramHMMs:
         self.unigram_wc["<STOP>"] = self.unigram_count["<STOP>"]
         for w,c in self.unigram_count.items():
             if w != "<START>" and w != "<STOP>":
-                self.unigram_wc[w] += c
+                self.unigram_wc[w[0]] += c
 
     def bigram_word_count(self):
         for (v,w),c in self.bigram_count.items():

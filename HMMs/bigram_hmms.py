@@ -23,6 +23,7 @@ def count_bigrams(corpus):
 def bigram_proba(u, v, unigram_count, bigram_count, V, k = 0):
     if (u,v) not in bigram_count:
         if u not in unigram_count:
+            # k/kV = 1/V
             p = 1/V
         else:
             p = k/(unigram_count[v]+k*V)
@@ -61,8 +62,8 @@ class bigramHMMs:
         self.bigram_count = count_bigrams(self.train_file)
 
         # unigram and bigram probabilities
-        self.unigram_probabilities = defaultdict(float)
-        self.bigram_probabilities = defaultdict(float)
+        self.unigram_tag_probabilities = defaultdict(float)
+        self.bigram_tag_probabilities = defaultdict(float)
 
         # unigram and bigram tag count
         self.unigram_tc = defaultdict(int)
@@ -71,19 +72,16 @@ class bigramHMMs:
         self.unigram_tag_count()
         self.bigram_tag_count()
 
-        # unique tags and
-        self.tags = set()
+        # unique tags and unique bigram tags
+        self.tags = set(self.unigram_tc.keys())
+        self.bigram_tags = set()
+        self.generate_bigram_tags()
 
-        self.make_bigram_proba_dict(self.train_file)
+        self.transition_probabilities = defaultdict(float)
+        self.transition_proba()
 
         self.emission_probabilities = defaultdict(float)
 
-    def make_bigram_proba_dict(self, corpus):
-        for sentence in corpus:
-            bigrams = generate_bigrams(sentence)
-            for bigram in bigrams:
-                self.bigram_probabilities[(bigram[0],bigram[1])] = bigram_proba(bigram[0],bigram[1],self.unigram_count, self.bigram_count, self.V, self.k)
-    
     # this would be for transition probabilities
     def unigram_tag_count(self):
         self.unigram_tc["<START>"] = self.unigram_count["<START>"]
@@ -101,9 +99,15 @@ class bigramHMMs:
             else:
                 self.bigram_tc[(v[1],w[1])] += c
 
+    def generate_bigram_tags(self):
+        for x in self.tags-{"<STOP>"}:
+            for y in self.tags-{"<START>"}:
+                self.bigram_tags.add((x,y))
 
     def transition_proba(self):
-        return None
+        for t in self.bigram_tags:
+            self.transition_probabilities[(t[0],t[1])] = \
+                bigram_proba(t[0],t[1],self.unigram_tc,self.bigram_tc,len(self.unigram_tc),self.k)
 
     def emission_proba(self):
         return None

@@ -109,9 +109,6 @@ class bigramHMMs:
             self.transition_probabilities[(t[0],t[1])] = \
                 bigram_proba(t[0],t[1],self.unigram_tc,self.bigram_tc,len(self.unigram_tc),self.k)
 
-    def emission_proba(self):
-        return None
-
     def viterbi_trellis(self):
         return None
 

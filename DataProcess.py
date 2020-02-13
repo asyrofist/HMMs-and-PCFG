@@ -1,5 +1,20 @@
 import string
 from collections import defaultdict
+import re
+url_pattern = re.compile("http|ht|https|www")
+hashtag_pattern = re.compile("^#")
+at_pattern = re.compile("^@")
+emoji_pattern = re.compile("[:|;][-?)|(|D|/|p|P|3]|;.;|;_;|-_-|<3")
+
+# for matching unicode emoji matching: 
+# https://gist.github.com/naotokui/ecce71bcc889e1dc42d20fade74b61e2
+unicode_emoji_pattern = re.compile(
+    u"(\ud83d[\ude00-\ude4f])|"  # emoticons
+    u"(\ud83c[\udf00-\uffff])|"  # symbols & pictographs (1 of 2)
+    u"(\ud83d[\u0000-\uddff])|"  # symbols & pictographs (2 of 2)
+    u"(\ud83d[\ude80-\udeff])|"  # transport & map symbols
+    u"(\ud83c[\udde0-\uddff])"  # flags (iOS)
+    "+", flags=re.UNICODE)
 
 def read_file(path):
     f = open(path, "r")

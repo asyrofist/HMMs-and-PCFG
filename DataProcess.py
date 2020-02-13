@@ -53,24 +53,40 @@ def tokenize_corpus(corpus, n):
             processed_corpus.append(["<START1>", "<START2>"] + tokenize_sentence(sentence) + ["<STOP>"])
     return processed_corpus
 
+def replace_pattern_words(corpus):
+    """
+    removes netspeak patterns from tokenized corpus, replaces with special tokens
+    """
+    cleaned_corpus = []
+    for sentence in dev:
+        cleaned_sentence = []
+        for word in sentence:
+
+            if word == "<START>" or word == "<STOP>":
+                cleaned_sentence.append(word)
+            else:
+                if url_pattern.match(word[0]):
+                    cleaned_sentence.append(("<URL>", word[1]))
+                elif hashtag_pattern.match(word[0]):
+                    cleaned_sentence.append(("<HASHTAG>", word[1]))
+                elif at_pattern.match(word[0]):
+                    cleaned_sentence.append(("<AT>", word[1]))
+                elif emoji_pattern.match(word[0]):
+                    cleaned_sentence.append(("<EMOJI>", word[1]))
+                elif unicode_emoji_pattern.match(word[0]):
+                    cleaned_sentence.append(("<EMOJI>", word[1]))
+                elif number_pattern.match(word[0]):
+                    cleaned_sentence.append(("<NUMBER>", word[1]))
+                else:
+                    cleaned_sentence.append(word)
+        cleaned_corpus.append(cleaned_sentence)
+    return cleaned_corpus
+
 def count_unigrams(corpus):
     unigram_count = defaultdict(int)
     for sentence in corpus:
         for word in sentence:
-            if url_pattern.match(word[0]):
-                unigram_count[("<URL>", word[1])] += 1
-            elif hashtag_pattern.match(word[0]):
-                unigram_count[("<HASHTAG>", word[1])] += 1
-            elif at_pattern.match(word[0]):
-                unigram_count[("<AT>",word[1])] += 1
-            elif emoji_pattern.match(word[0]):
-                unigram_count[("<EMOJI>",word[1])] += 1
-            elif unicode_emoji_pattern.match(word[0]):
-                unigram_count[("<EMOJI>",word[1])] += 1
-            elif number_pattern.match(word[0]):
-                unigram_count[("<NUMBER>",word[1])] += 1
-            else:
-                unigram_count[word] += 1
+            unigram_count[word] += 1
     return unigram_count
 
 def extract_vocab(unigram_count, min_count = 1):
@@ -103,5 +119,4 @@ def set_unk(corpus, vocab):
 
 def remove_punctuation(sentence):
     return sentence.translate(str.maketrans('','',string.punctuation))
-
 

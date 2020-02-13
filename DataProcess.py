@@ -1,11 +1,15 @@
 import string
 from collections import defaultdict
 import re
+
+#########################################
+# a bunch of regex patterns for netspeak#
+#########################################
+
 url_pattern = re.compile("http|ht|https|www")
 hashtag_pattern = re.compile("^#")
 at_pattern = re.compile("^@")
 emoji_pattern = re.compile("[:|;][-?)|(|D|/|p|P|3]|;.;|;_;|-_-|<3")
-
 # for matching unicode emoji matching: 
 # https://gist.github.com/naotokui/ecce71bcc889e1dc42d20fade74b61e2
 unicode_emoji_pattern = re.compile(
@@ -15,6 +19,7 @@ unicode_emoji_pattern = re.compile(
     u"(\ud83d[\ude80-\udeff])|"  # transport & map symbols
     u"(\ud83c[\udde0-\uddff])"  # flags (iOS)
     "+", flags=re.UNICODE)
+number_pattern = re.compile("^\$\d+.?\d+|^#\d+|one|two|three|four|five|six|seven|eight|nine|ten|thousand|million|billion|trillion|\d+|\d+?M$", re.IGNORECASE)
 
 def read_file(path):
     f = open(path, "r")
@@ -52,7 +57,20 @@ def count_unigrams(corpus):
     unigram_count = defaultdict(int)
     for sentence in corpus:
         for word in sentence:
-            unigram_count[word] += 1
+            if url_pattern.match(word[0]):
+                unigram_count[("<URL>", word[1])] += 1
+            elif hashtag_pattern.match(word[0]):
+                unigram_count[("<HASHTAG>", word[1])] += 1
+            elif at_pattern.match(word[0]):
+                unigram_count[("<AT>",word[1])] += 1
+            elif emoji_pattern.match(word[0]):
+                unigram_count[("<EMOJI>",word[1])] += 1
+            elif unicode_emoji_pattern.match(word[0]):
+                unigram_count[("<EMOJI>",word[1])] += 1
+            elif number_pattern.match(word[0]):
+                unigram_count[("<NUMBER>",word[1])] += 1
+            else:
+                unigram_count[word] += 1
     return unigram_count
 
 def extract_vocab(unigram_count, min_count = 1):

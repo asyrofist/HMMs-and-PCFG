@@ -74,6 +74,7 @@ class bigramHMMs:
 
         # unique tags and unique bigram tags
         self.tags = set(self.unigram_tc.keys())
+        self.T = self.tags - {"<START>","<STOP>"} # all tags except start and stop
         self.bigram_tags = set()
         self.generate_bigram_tags()
 
@@ -84,6 +85,9 @@ class bigramHMMs:
         self.dev_emission_probabilities = self.emission_probabilities_from_corpus(self.dev_file)
         self.test_emission_probabilities = self.emission_probabilities_from_corpus(self.test_file)
 
+        # calculate initial distribution
+        self.initial = defaultdict(float)
+        self.initial_distribution()
     # this would be for transition probabilities
     def unigram_tag_count(self):
         self.unigram_tc["<START>"] = self.unigram_count["<START>"]
@@ -113,12 +117,18 @@ class bigramHMMs:
 
     def emission_probabilities_from_corpus(self, corpus):
         emit_dict = defaultdict(float)
-        tokenized_corpus = tokenize_corpus(corpus)
+        tokenized_corpus = tokenize_corpus(corpus,2)
         for sentence in tokenized_corpus:
             for token in sentence[1:-1]:
-                for tag in self.tags:
+                for tag in self.tags-{"<START>","<STOP>"}:
                     emit_dict[(token[0],tag)] = emission_proba(token[0], tag, self.unigram_count, self.unigram_tc)
         return emit_dict
+
+    def initial_distribution(self):
+        for (x,y),p in self.transition_probabilities.items()
+            if x == "<START>":
+                self.initial[(x,y)] = p
+
 
     def viterbi_trellis(self):
         return None

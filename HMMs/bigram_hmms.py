@@ -80,7 +80,9 @@ class bigramHMMs:
         self.transition_probabilities = defaultdict(float)
         self.transition_proba()
 
-        self.emission_probabilities = defaultdict(float)
+        # calculate emission probability dictionary from dev set and test set
+        self.dev_emission_probabilities = self.emission_probabilities_from_corpus(self.dev_file)
+        self.test_emission_probabilities = self.emission_probabilities_from_corpus(self.test_file)
 
     # this would be for transition probabilities
     def unigram_tag_count(self):
@@ -108,6 +110,15 @@ class bigramHMMs:
         for t in self.bigram_tags:
             self.transition_probabilities[(t[0],t[1])] = \
                 bigram_proba(t[0],t[1],self.unigram_tc,self.bigram_tc,len(self.unigram_tc),self.k)
+
+    def emission_probabilities_from_corpus(self, corpus):
+        emit_dict = defaultdict(float)
+        tokenized_corpus = tokenize_corpus(corpus)
+        for sentence in tokenized_corpus:
+            for token in sentence[1:-1]:
+                for tag in self.tags:
+                    emit_dict[(token[0],tag)] = emission_proba(token[0], tag, self.unigram_count, self.unigram_tc)
+        return emit_dict
 
     def viterbi_trellis(self):
         return None

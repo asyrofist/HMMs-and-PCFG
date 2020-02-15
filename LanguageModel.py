@@ -1,5 +1,6 @@
 from TextProcess import ProcessedCorpus
 from collections import defaultdict
+from math import log
 
 def generate_ngram(n, sentence):
     n_grams = []
@@ -13,8 +14,6 @@ def pad_corpus(n, corpus):
     for sentence in corpus:
         new_corpus.append([("<START>","<START>")]*(n-1) + sentence+ [("<STOP>","<STOP>")])
     return new_corpus
-
-#corpus = ProcessedCorpus(train, dev, test, min_count)
 
 class LanguageModel:
 
@@ -30,9 +29,8 @@ class LanguageModel:
 
         # smoothing parameters
         self.k = 1
-        self.l1 = 0
-        self.l2 = 0
-        self.l3 = 0
+        self.l2 = (0,1) # bigram lambda
+        self.l3 = (0,0,1) # trigram lambda
 
         # unigrams
         self.unigram_count = defaultdict(int)
@@ -68,12 +66,17 @@ class LanguageModel:
         self.unigram_mles = defaultdict(float)
         self.bigram_mles = defaultdict(float)
         self.trigram_mles = defaultdict(float)
+        self.unigram_mle_dict()
         self.bigram_mle_dict()
         self.trigram_mle_dict()
 
-    def set_smoothing_params(self, k, l1, l2, l3):
+        # linear interpolated mle probabilities
+        self.bigram_probabilities = defaultdict(float)
+        self.trigram_probabilities = defaultdict(float)
+        self.linear_interpolation()
+
+    def set_smoothing_params(self, k, l2, l3):
         self.k = k
-        self.l1 = l1
         self.l2 = l2
         self.l3 = l3
 
@@ -140,8 +143,47 @@ class LanguageModel:
         for t in self.all_possible_trigram_tags:
             self.trigram_mles[t] = self.ngram_mle((t[0],t[1]), t, self.bigram_tc, self.trigram_tc, self.tag_len)
 
+    def linear_interpolation(self):
+        for (x,y),p in self.bigram_mles.items():
+            self.bigram_probabilities[(x,y)] = self.l2[0] * self.unigram_mles[y] + self.l2[1] * p
 
+        for (x,y,z),p in self.trigram_mles.items():
+            self.trigram_probabilities[(x,y,z)] = self.l3[0] * self.unigram_mles[z] + self.l3[1] * self.bigram_mles[(y,z)] + self.l3[2] * p
 
+    def log_proba(self, ngram, ngram_proba_dict):
+        return -log(ngram_proba_dict.get(ngram),2)
 
+    def perplexity(self, corpus):
+        # bigram perplexity
+        bigram_pp = []
+        N = 0
+        for sentence in corpus:
+            pp_sent = 0
+            bigrams = generate_ngram(2, sentence)
+            for (x,y) in bigrams:
+                pp_sent += self.log_proba((x[1],y[1]),self.bigram_probabilities)
+            N += len(bigrams)
+            bigram_pp.append(pp_sent)
+        bigram_perplexity = 2**(sum(bigram_pp)/N)
 
+        # trigram perplexity
+        trigram_pp = []
+        M = 0
+        for sentence in corpus:
+            pp_sent = 0
+            trigrams = generate_ngram(3, sentence)
+            for (x,y,z) in trigrams:
+                pp_sent += self.log_proba((x[1], y[1], z[1]), self.trigram_probabilities)
+            M += len(trigrams)
+            trigram_pp.append(pp_sent)
+        trigram_perplexity = 2**(sum(trigram_pp)/M)
+
+        return bigram_perplexity, trigram_perplexity
+
+    def update(self, k, l2, l3):
+        self.set_smoothing_params(k, l2, l3)
+        self.unigram_mle_dict()
+        self.bigram_mle_dict()
+        self.trigram_mle_dict()
+        self.linear_interpolation()
 

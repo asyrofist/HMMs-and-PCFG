@@ -54,12 +54,51 @@ class TrigramHMM:
         return emission_probabilities
 
     def initial_distribution(self):
-        for x,p in self.trigram_transition_proba.items():
-            if x[0] == "<START>" and x[1] == "<START>":
-                self.initial[x] = p
+        for t in self.tags:
+            self.initial[("<START>","<START>",t)] = self.lm.trigram_tc[("<START>","<START>",t)]/len(self.lm.train)
+
+
 
     def trigram_viterbi(self, sentence, emission_proba):
-        return None
+        pi = defaultdict(dict)
+        # initialize
+        for t in self.tags:
+            pi[(0, sentence[0][0])][t] = {"prob" : self.initial[("<START>","<START>",t)] * emission_proba[(sentence[0][0],t)],\
+                          "prev": "<START>"}
+
+        # go through the rest of the sentence
+        for i in range(1,len(sentence)):
+            prev_word = sentence[i-1][0]
+            word = sentence[i][0]
+            for prev2 in self.tags:
+                for current_tag in self.tags:
+                    proba = dict()
+                    for prev1 in self.tags:
+                        p = self.trigram_transition_proba[(prev1, prev2, current_tag)] * emission_proba[(word, current_tag)]
+                        proba[prev1] = p* pi[(i-1, prev_word)][prev1]["prob"]
+                    prev_state = max(proba, key=proba.get)
+                    max_proba = proba[prev_state]
+                    pi[(i,word)][current_tag] = {"prob" : max_proba, "prev" : prev_state}
+        return pi
+
+    def backtrace(self, pi, sentence):
+        sentence = [(i,x[0]) for i,x in enumerate(sentence)]
+
+        final_word = sentence[-1]
+        final_tag = None
+        max_p = 0-
+
+        for tag, d in pi[final_word].items():
+            if d["prob"] > max_p:
+                final_tag = tag-
+                max_p = d["prob"]
+                prev_state = d["prev"]
+
+        pred_tags = [final_tag]
+        for word in sentence[::-1]:
+            final_tag = pi[word][final_tag]["prev"]
+            pred_tags.append(final_tag)
+        return pred_tags[::-1]
 
     def analyze_results(self, testset, preds):
         y_true = []

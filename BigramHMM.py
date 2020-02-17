@@ -63,7 +63,7 @@ class BigramHMM:
         initial = self.initial
         bigram_transition_proba = self.bigram_transition_proba
         for tag in self.tags:
-            pi[sentence[0][0]][tag] = \
+            pi[(0, sentence[0][0])][tag] = \
                 {"prob": initial[("<START>",tag)] * emission_proba[(sentence[0][0], tag)], \
                  "prev": "<START>"}
         for i in range(1,len(sentence)):
@@ -75,15 +75,17 @@ class BigramHMM:
                 proba = dict()
                 for prev_tag in self.tags:
                     p = bigram_transition_proba[(prev_tag,current_tag)] * emission_proba[(word,current_tag)]
-                    proba[(prev_tag, current_tag)] = pi[prev_word][prev_tag]["prob"] * p
+                    proba[(prev_tag, current_tag)] = pi[(i-1, prev_word)][prev_tag]["prob"] * p
 
                 prev_state = max(proba, key=proba.get)
                 max_proba = proba[prev_state]
-                pi[word][current_tag] = {"prob": max_proba, "prev": prev_state[0]}
+                pi[(i, word)][current_tag] = {"prob": max_proba, "prev": prev_state[0]}
         return pi
 
     def backtrace(self, pi, sentence):
-        final_word = sentence[-1][0]
+        sentence = [(i,x[0]) for i,x in enumerate(sentence)]
+
+        final_word = sentence[-1]
         final_tag = None
         max_p = 0
 
@@ -94,10 +96,11 @@ class BigramHMM:
                 prev_state = d["prev"]
 
         pred_tags = [final_tag]
-        for (word, _) in sentence[::-1]:
+        for word in sentence[::-1]:
             final_tag = pi[word][final_tag]["prev"]
             pred_tags.append(final_tag)
         return pred_tags[::-1]
+
 
     def test_viterbi(self, testset, emission_proba_dict):
         all_pis = []

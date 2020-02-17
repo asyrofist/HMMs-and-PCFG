@@ -86,11 +86,11 @@ class TrigramHMM:
 
         final_word = sentence[-1]
         final_tag = None
-        max_p = 0-
+        max_p = 0
 
         for tag, d in pi[final_word].items():
             if d["prob"] > max_p:
-                final_tag = tag-
+                final_tag = tag
                 max_p = d["prob"]
                 prev_state = d["prev"]
 
@@ -124,7 +124,14 @@ class TrigramHMM:
         normalized = confusion_matrix_array / (confusion_matrix_array.astype(np.float).sum(axis=1)+0.01)
         return accuracy, y_true, y_pred, confusion_matrix_array, normalized
 
+    def test_trigram_viterbi(self, testset):
+        all_pred_test = []
 
+        for sentence in thmm.test:
+            pi = thmm.trigram_viterbi(sentence, thmm.test_emission_probabilities)
+            pred = thmm.backtrace(pi, sentence)
+            all_pred_test.append(pred[1:])
+        return all_pred_test
 
 
 

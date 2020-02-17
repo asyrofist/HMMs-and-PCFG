@@ -10,19 +10,17 @@ url_pattern = re.compile("http|ht|https|www")
 hashtag_pattern = re.compile("^#")
 at_pattern = re.compile("^@")
 emoji_pattern = re.compile("[:|;][-?)|(|D|/|p|P|3]|;.;|;_;|-_-|<3")
-# for matching unicode emoji matching: 
-# https://gist.github.com/naotokui/ecce71bcc889e1dc42d20fade74b61e2
-unicode_emoji_pattern = re.compile(
-    u"(\ud83d[\ude00-\ude4f])|"  # emoticons
-    u"(\ud83c[\udf00-\uffff])|"  # symbols & pictographs (1 of 2)
-    u"(\ud83d[\u0000-\uddff])|"  # symbols & pictographs (2 of 2)
-    u"(\ud83d[\ude80-\udeff])|"  # transport & map symbols
-    u"(\ud83c[\udde0-\uddff])"  # flags (iOS)
-    "+", flags=re.UNICODE)
+#bunch of unicode emoji pattern \ud8...etc looking things
+unicode_emoji_pattern = re.compile(u'('
+    u'\ud83c[\udf00-\udfff]|'
+    u'\ud83d[\udc00-\ude4f\ude80-\udeff]|'
+    u'[\u2600-\u26FF\u2700-\u27BF])+', 
+    re.UNICODE)
+
 number_pattern = re.compile("^\$\d+.?\d+|^#\d+|one|two|three|four|five|six|seven|eight|nine|ten|thousand|million|billion|trillion|\d+|\d+?M$", re.IGNORECASE)
 
 def read_file(path):
-    f = open(path, "r")
+    f = open(path, "r",encoding='utf-8')
     return f.read().splitlines()
 
 def tokenize_sentence(sentence):
@@ -58,7 +56,7 @@ def replace_pattern_words(corpus):
     removes netspeak patterns from tokenized corpus, replaces with special tokens
     """
     cleaned_corpus = []
-    for sentence in dev:
+    for sentence in corpus:
         cleaned_sentence = []
         for word in sentence:
 
@@ -78,7 +76,7 @@ def replace_pattern_words(corpus):
                 elif number_pattern.match(word[0]):
                     cleaned_sentence.append(("<NUMBER>", word[1]))
                 else:
-                    cleaned_sentence.append(word)
+                    cleaned_sentence.append((word[0].lower(),word[1]))
         cleaned_corpus.append(cleaned_sentence)
     return cleaned_corpus
 

@@ -42,7 +42,10 @@ def convert_emojis(token):
     return "".join(new_token)
 
 def tokenize_corpus(corpus):
+    if len(corpus) > 50000:
+        corpus = corpus[:150000]
     new_corpus = []
+
     for sentence in corpus:
         new_sentence = []
         for word in sentence:
